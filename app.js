@@ -14,13 +14,22 @@ document.getElementById("dashSale").onclick=()=>invoiceForm("sale");
 document.getElementById("dashPurchase").onclick=()=>invoiceForm("purchase");
 document.getElementById("dashParty").onclick=()=>partyForm();
 document.getElementById("dashItem").onclick=()=>itemForm();
+document.getElementById("dashPayment").onclick=openQuickPayment;
+document.getElementById("dashLedger").onclick=()=>go("ledger");
+document.getElementById("dashOutstanding").onclick=()=>go("outstanding");
+document.getElementById("dashStock").onclick=()=>go("stock");
+function openQuickPayment(){const due=db.invoices.filter(x=>x.type==="sale"&&Number(x.balance)>0);if(!due.length){toast("No customer outstanding invoices");return}const opts=due.map(x=>'<option value="'+x.id+'">'+esc(x.number)+' · '+esc(db.parties.find(p=>p.id===x.partyId)?.name||"Party")+' · '+money(x.balance)+'</option>').join("");openModal("Receive customer payment",'<form id="quickPaymentForm" class="entry-grid"><label class="field wide">Select invoice<select name="invoiceId" required>'+opts+'</select></label><div class="wide notice">Choose an invoice to record its payment and update the balance.</div><div class="wide modal-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Continue to payment</button></div></form>');document.getElementById("quickPaymentForm").onsubmit=e=>{e.preventDefault();const id=new FormData(e.target).get("invoiceId");closeModal();receivePayment(id)}}
+
 const quickSearch=document.getElementById("quickSearch");
 quickSearch.addEventListener("keydown",e=>{if(e.key==="Enter")runGlobalSearch(quickSearch.value)});
-function runGlobalSearch(query){const q=String(query||"").trim().toLowerCase();if(!q)return;const hits=[];
+function runGlobalSearch(query){const raw=String(query||"").trim(),q=raw.toLowerCase();if(!q)return;
+const commands=[[/^(new )?(sale|sales|invoice|bill)$/,"sale"],[/^(new )?(purchase|buying)$/,"purchase"],[/^(add )?(party|customer|supplier)$/,"party"],[/^(add )?(item|product)$/,"item"],[/^(receive|collect) payment$/,"payment"],[/^ledger$/,"ledger"],[/^outstanding$/,"outstanding"],[/^(stock|inventory)$/,"stock"]];
+for(const [re,action] of commands){if(re.test(q)){if(action==="sale")invoiceForm("sale");else if(action==="purchase")invoiceForm("purchase");else if(action==="party")partyForm();else if(action==="item")itemForm();else if(action==="payment")openQuickPayment();else go(action);quickSearch.value="";return}}
+const hits=[];
 db.invoices.filter(x=>(String(x.number)+" "+String(x.date)+" "+(db.parties.find(p=>p.id===x.partyId)?.name||"")+" "+x.type).toLowerCase().includes(q)).slice(0,8).forEach(x=>hits.push({label:x.number+" · "+(db.parties.find(p=>p.id===x.partyId)?.name||"Party")+" · "+money(x.total),sub:x.type==="sale"?"Sales invoice":"Purchase invoice",page:x.type==="sale"?"sales":"purchases"}));
 db.parties.filter(x=>(x.name+" "+(x.phone||"")+" "+(x.gstin||"")).toLowerCase().includes(q)).slice(0,5).forEach(x=>hits.push({label:x.name,sub:"Party · "+x.type,page:"parties"}));
 db.items.filter(x=>(x.name+" "+(x.code||"")).toLowerCase().includes(q)).slice(0,5).forEach(x=>hits.push({label:x.name,sub:"Item · "+money(x.rate),page:"items"}));
-openModal("Search results for “"+esc(query)+"”",hits.length?'<div class="search-results">'+hits.map(x=>'<button type="button" class="search-result" onclick="go(\''+x.page+'\');closeModal()"><strong>'+esc(x.label)+'</strong><small>'+esc(x.sub)+'</small></button>').join("")+'</div>':'<div class="empty">No matching records found.</div>')}
+openModal("Search results for “"+esc(raw)+"”",hits.length?'<div class="search-results">'+hits.map(x=>'<button type="button" class="search-result" onclick="go(\\''+x.page+'\\');closeModal()"><strong>'+esc(x.label)+'</strong><small>'+esc(x.sub)+'</small></button>').join("")+'</div>':'<div class="empty">No matching records found.</div>')}
 document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();quickSearch.focus()}if(e.key==="Escape")closeModal();if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==="s"){e.preventDefault();invoiceForm("sale")}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==="p"){e.preventDefault();invoiceForm("purchase")}});
 
 document.getElementById("closeModal").onclick=closeModal;document.getElementById("modalBackdrop").addEventListener("click",e=>{if(e.target.id==="modalBackdrop")closeModal()});
