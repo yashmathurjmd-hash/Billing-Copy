@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Billing Copy — Business Billing</title>
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="mobile.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar"><div class="brand"><span class="brand-mark">BC</span><div><b>Billing Copy</b><small>Business billing</small></div></div>
+<nav id="sideNav">
+<button class="nav-item active" data-page="overview">▦ <span>Overview</span></button>
+<button class="nav-item" data-page="sales">＋ <span>Sales billing</span></button>
+<button class="nav-item" data-page="purchases">⇩ <span>Purchase billing</span></button>
+<button class="nav-item" data-page="parties">♙ <span>Party master</span></button>
+<button class="nav-item" data-page="ledger">▤ <span>Party ledger</span></button>
+<button class="nav-item" data-page="outstanding">◷ <span>Outstanding</span></button>
+<button class="nav-item" data-page="stock">▣ <span>Stock report</span></button>
+<button class="nav-item" data-page="items">◇ <span>Item master</span></button>
+<button class="nav-item" data-page="settings">⚙ <span>Company settings</span></button>
+</nav><div class="sidebar-foot">Local workspace · v1.0</div></aside>
+<main class="main"><header class="topbar"><div><span class="eyebrow">WORKSPACE</span><h1 id="pageTitle">Overview</h1></div><div class="top-actions"><span class="status-dot">● Local data</span><button class="primary" id="quickSale">＋ New sale</button></div></header>
+<section id="page-overview" class="page active"><div class="welcome"><div><span class="eyebrow light">BUSINESS SUMMARY</span><h2>Good business starts with clear books.</h2><p>Create invoices, track payments and keep stock in one place.</p></div><button class="light-btn" data-go="sales">Create sales invoice →</button></div>
+<div class="stats"><article class="stat"><span>Sales total</span><strong id="statSales">₹0.00</strong><small>This workspace</small></article><article class="stat"><span>Purchase total</span><strong id="statPurchases">₹0.00</strong><small>This workspace</small></article><article class="stat"><span>Receivables</span><strong id="statReceivable">₹0.00</strong><small>Customer balances</small></article><article class="stat"><span>Payables</span><strong id="statPayable">₹0.00</strong><small>Supplier balances</small></article></div>
+<div class="panel"><div class="panel-head"><div><h3>Recent invoices</h3><p>Your latest sales and purchase entries</p></div><button class="text-btn" data-go="sales">View sales</button></div><div id="recentInvoices"></div></div>
+<div class="notice"><b>Important:</b> This starter stores data in this browser only. It does not sync between devices or provide server backup yet. Export your data regularly.</div></section>
+<section id="page-sales" class="page"><div class="panel"><div class="panel-head"><div><h3>Sales invoices</h3><p>Create and manage customer invoices</p></div><button class="primary" id="addSale">＋ New sales invoice</button></div><div id="salesList"></div></div></section>
+<section id="page-purchases" class="page"><div class="panel"><div class="panel-head"><div><h3>Purchase invoices</h3><p>Record supplier purchases and stock inward</p></div><button class="primary" id="addPurchase">＋ New purchase invoice</button></div><div id="purchaseList"></div></div></section>
+<section id="page-parties" class="page"><div class="panel"><div class="panel-head"><div><h3>Party master</h3><p>Customers and suppliers</p></div><button class="primary" id="addParty">＋ Add party</button></div><div id="partiesList"></div></div></section>
+<section id="page-items" class="page"><div class="panel"><div class="panel-head"><div><h3>Item master</h3><p>Products, sale rates and GST</p></div><button class="primary" id="addItem">＋ Add item</button></div><div id="itemsList"></div></div></section>
+<section id="page-ledger" class="page"><div class="panel"><div class="panel-head"><div><h3>Party ledger</h3><p>Invoice-wise transactions and balances</p></div><select id="ledgerParty"><option value="">All parties</option></select></div><div id="ledgerList"></div></div></section>
+<section id="page-outstanding" class="page"><div class="panel"><div class="panel-head"><div><h3>Outstanding report</h3><p>Unpaid invoice balances</p></div></div><div id="outstandingList"></div></div></section>
+<section id="page-stock" class="page"><div class="panel"><div class="panel-head"><div><h3>Stock report</h3><p>Purchase quantity less sales quantity</p></div></div><div id="stockList"></div></div></section>
+<section id="page-settings" class="page"><div class="panel form-panel"><h3>Company settings</h3><p>These details appear on printed invoices.</p><form id="settingsForm" class="form-grid"><label>Company name<input name="name" required></label><label>GSTIN<input name="gstin"></label><label>Phone<input name="phone"></label><label>Email<input name="email" type="email"></label><label class="wide">Address<textarea name="address" rows="2"></textarea></label><label>State<input name="state" value="Maharashtra"></label><label>Invoice prefix<input name="prefix" value="INV-"></label><div class="wide form-actions"><button class="primary">Save settings</button><button type="button" class="secondary" id="exportData">Export backup (JSON)</button><label class="file-btn">Import backup<input id="importData" type="file" accept="application/json" hidden></label></div></form><div class="notice">Data is saved in this browser's local storage. For multi-device access, login, cloud database, GST compliance and automated PDF/WhatsApp delivery, a secure backend is required.</div></div></section>
+</main></div>
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal" role="dialog" aria-modal="true"><div class="modal-head"><h2 id="modalTitle">New entry</h2><button class="icon-btn" id="closeModal" aria-label="Close">✕</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast" role="status"></div>
+</body></html>
