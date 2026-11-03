@@ -10,6 +10,19 @@ function go(p){activePage=p;document.querySelectorAll(".page").forEach(x=>x.clas
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 document.getElementById("quickSale").onclick=()=>invoiceForm("sale");document.getElementById("addSale").onclick=()=>invoiceForm("sale");document.getElementById("addPurchase").onclick=()=>invoiceForm("purchase");document.getElementById("addParty").onclick=partyForm;document.getElementById("addItem").onclick=itemForm;
+document.getElementById("dashSale").onclick=()=>invoiceForm("sale");
+document.getElementById("dashPurchase").onclick=()=>invoiceForm("purchase");
+document.getElementById("dashParty").onclick=()=>partyForm();
+document.getElementById("dashItem").onclick=()=>itemForm();
+const quickSearch=document.getElementById("quickSearch");
+quickSearch.addEventListener("keydown",e=>{if(e.key==="Enter")runGlobalSearch(quickSearch.value)});
+function runGlobalSearch(query){const q=String(query||"").trim().toLowerCase();if(!q)return;const hits=[];
+db.invoices.filter(x=>(String(x.number)+" "+String(x.date)+" "+(db.parties.find(p=>p.id===x.partyId)?.name||"")+" "+x.type).toLowerCase().includes(q)).slice(0,8).forEach(x=>hits.push({label:x.number+" · "+(db.parties.find(p=>p.id===x.partyId)?.name||"Party")+" · "+money(x.total),sub:x.type==="sale"?"Sales invoice":"Purchase invoice",page:x.type==="sale"?"sales":"purchases"}));
+db.parties.filter(x=>(x.name+" "+(x.phone||"")+" "+(x.gstin||"")).toLowerCase().includes(q)).slice(0,5).forEach(x=>hits.push({label:x.name,sub:"Party · "+x.type,page:"parties"}));
+db.items.filter(x=>(x.name+" "+(x.code||"")).toLowerCase().includes(q)).slice(0,5).forEach(x=>hits.push({label:x.name,sub:"Item · "+money(x.rate),page:"items"}));
+openModal("Search results for “"+esc(query)+"”",hits.length?'<div class="search-results">'+hits.map(x=>'<button type="button" class="search-result" onclick="go(\''+x.page+'\');closeModal()"><strong>'+esc(x.label)+'</strong><small>'+esc(x.sub)+'</small></button>').join("")+'</div>':'<div class="empty">No matching records found.</div>')}
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();quickSearch.focus()}if(e.key==="Escape")closeModal();if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==="s"){e.preventDefault();invoiceForm("sale")}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==="p"){e.preventDefault();invoiceForm("purchase")}});
+
 document.getElementById("closeModal").onclick=closeModal;document.getElementById("modalBackdrop").addEventListener("click",e=>{if(e.target.id==="modalBackdrop")closeModal()});
 function openModal(title,html){document.getElementById("modalTitle").textContent=title;document.getElementById("modalBody").innerHTML=html;document.getElementById("modalBackdrop").classList.add("open")}
 function closeModal(){document.getElementById("modalBackdrop").classList.remove("open")}
